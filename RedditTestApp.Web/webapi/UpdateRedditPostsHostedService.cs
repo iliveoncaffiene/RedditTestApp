@@ -20,7 +20,7 @@ public class UpdateRedditPostsHostedService : BackgroundService
         }
     }
 
-    private async Task UpdatePosts()
+    public async Task UpdatePosts()
     {
         using var scope = _serviceProvider.CreateScope();
 

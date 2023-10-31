@@ -41,8 +41,15 @@ public class RedditClient : IRedditClient, IDisposable
 
     private DateTime? TokenExpiration => OAuthCredentialsModel != null ? LastAuthTime?.Add(OAuthCredentialsModel.ExpirationDuration) : null;
 
+    private bool IsAuthorizing { get; set; }
+
     private async Task EnsureAuthorization()
     {
+        while (IsAuthorizing) 
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1));
+        }
+
         if (DateTime.UtcNow.Add(AuthorizationBufferTime) < TokenExpiration)
         {
             return;
@@ -50,6 +57,7 @@ public class RedditClient : IRedditClient, IDisposable
 
         try
         {
+            IsAuthorizing = true;
             var response = await _authService.Authorize();
             LastAuthTime = DateTime.UtcNow;
             OAuthCredentialsModel = response;
@@ -60,6 +68,10 @@ public class RedditClient : IRedditClient, IDisposable
             Console.Error.WriteLine(ex.StackTrace);
             LastAuthTime = null;
             OAuthCredentialsModel = null;
+        }
+        finally
+        {
+            IsAuthorizing = false;
         }
     }
 

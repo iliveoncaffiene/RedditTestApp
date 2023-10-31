@@ -24,7 +24,7 @@ public class PollRedditPostsHostedService : BackgroundService
         return Task.WhenAll(_subreddits.Select(x => SubredditListenAsync(stoppingToken, x)));
     }
 
-    private async Task SubredditListenAsync(CancellationToken token, string subreddit)
+    public async Task SubredditListenAsync(CancellationToken token, string subreddit)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(20));
 
